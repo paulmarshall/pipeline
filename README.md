@@ -118,7 +118,7 @@ The example pipeline given in pipeline.template.default.xml, recognises the foll
 Usage Scenarios
 ---------------
 
-## Commit Build
+## Commit Stage
 A CI (Continuous Integration) Tool is configured to run a Commit job.
 
 The Commit job:
@@ -130,13 +130,13 @@ The Commit job:
 	* The job runs MSBuild with the following arguments
 
 			msbuild build.xml /t:Commit
-			
+
 	* The job reports on the outcome of msbuild
 	* The job zips the output of the Commit job (the "Artefact")
 	* The job copies the Artefact to the "Artefact Repository"
 	* The job automatically runs the Acceptance job
 
-## Acceptance Build
+## Acceptance Stage
 A CI (Continuous Integration) Tool is configured to run an Acceptance job.
 
 The Acceptance job:
