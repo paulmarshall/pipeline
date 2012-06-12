@@ -5,16 +5,14 @@ Quick Start
 1. Git clone this repository
 2. Run Visual Studio Command Prompt (navigate to your local repository)
 3. Run the following command
-
 		msbuild build.xml /t:Local
 4. This generates the following output:
-
 		Microsoft (R) Build Engine version 4.0.30319.17379
 		[Microsoft .NET Framework, version 4.0.30319.17379]
 		Copyright (C) Microsoft Corporation. All rights reserved.
 
-		Build started 12/06/2012 21:59:05.
-		Project "D:\Projects\Wavecrest\git\pipeline\src\build.xml" on node 1 (Local target(s)).
+		Build started 12/06/2012 22:24:05.
+		Project "C:\Users\Paul\Documents\GitHub\pipeline\build.xml" on node 1 (Local target(s)).
 		SetPipelineStageToLocal:
 		  SetPipelineStageToLocal
 		GetVersionFromFile:
@@ -82,13 +80,14 @@ Quick Start
 		  SmokeTest
 		Local:
 		  Local
-		Done Building Project "D:\Projects\Wavecrest\git\pipeline\src\build.xml" (Local target(s)).
+		Done Building Project "C:\Users\Paul\Documents\GitHub\pipeline\build.xml" (Local target(s)).
 
 		Build succeeded.
 		    0 Warning(s)
 		    0 Error(s)
 
-		Time Elapsed 00:00:10.35
+		Time Elapsed 00:00:01.23
+
 
 
 Concept
