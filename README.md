@@ -99,57 +99,39 @@ This book describes "an effective pattern for getting software from development 
 
 The pattern central to the book is the "deployment pipeline", an automated implementation of an application's build, deploy, test and release process.
 
-Framework
----------
-* All pipeline files are MSBuild v4.0 compatible project files
-* **build.xml** defines your "package specific" build, test and release processes
-* **pipeline.xml** (imported by build.xml) defines the "teams" general build, test and release processes
-* **pipeline.template.default.xml** (imported by pipeline.xml) defines a general purpose template of build, test and release processes
-* **pipeline.core.xml** (imported by pipeline.template.default.xml) defines the core pipeline stages and steps
+Overview
+--------
+The Pipeline framework is built upon MSBuild v4.0 and is comprised of the following files:
 
-The example pipeline given in pipeline.template.default.xml, recognises the following stages:
-* Local
-* Commit
-* Acceptance
-* QA (Quality Assurance)
-* UAT (User Acceptance Testing)
-* Production
+* Core
+	* pipeline.xml
+		Defines core concepts of steps in a deployment pipeline
+* Pipeline templates
+	* pipeline.template.default.xml
+		Provides an example deployment pipeline
+* Pipeline plugins
+	* pipeline.plugin.version.xml
+		Reads version information from an XML file
+	* pipeline.plugin.nunit.xml
+		Runs nunit tests
+	* pipeline.plugin.nunit.config.xml
+		Implements an inline task to update
+* Sample project build file
+	* build.xml
+* Sample version file (for use with pipeline.plugin.version.xml)
+	* version.xml
 
-Usage Scenarios
----------------
+History
+-------
+This framework was built to provide a build, test and deployment framework for a client. The client had SVN for a SCM and Hudson as a CI server.
 
-### Commit Stage
-A CI (Continuous Integration) Tool is configured to run a Commit job.
+Jobs were created in Hudson to represent each stage in the pipeline. The Commit job monitored changes to a SVN repository. When a change was detected, the job ran a MSBuild action that loaded build.xml, and calling the "Commit" target. The output of this job was an artifact. In addition, the job triggered the Acceptance job.
 
-The Commit job:
-* Polls a source repository for changes
-* Job triggered when a change in the source is detected
-* When a change is detected:
-	* The "workspace" for the job is emptied
-	* The source is fetched from the repository into the workspace
-	* The job runs MSBuild with the following arguments
+The Acceptance job retrieved the "last stable" artifact from the Commit job and once again ran a MSBuild action that loaded build.xml but this time calling the Acceptance target.
 
-			msbuild build.xml /t:Commit
-
-	* The job reports on the outcome of msbuild
-	* The job zips the output of the Commit job (the "Artefact")
-	* The job copies the Artefact to the "Artefact Repository"
-	* The job automatically runs the Acceptance job
-
-### Acceptance Stage
-A CI (Continuous Integration) Tool is configured to run an Acceptance job.
-
-The Acceptance job:
-* Is triggered by an "upstream" Commit job
-* When triggered:
-	* The job empties the "workspace" for the job
-	* The job fetches the source from the repository associated with the Commit job (this retrieves the pipeline files)
-	* The job retrives the artefact from the "last stable build" of the associated Commit job
-	* The job runs MSBuild with the following arguments
-
-			msbuild build.xml /t:Acceptance
-
-	* The job reports on the outcome of msbuild
+How to use this framework
+-------------------------
+Clone this git repository and "override" targets in the pipeline framework to perform custom steps to meet your requirements.
 
 Contributors
 ------------
