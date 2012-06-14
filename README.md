@@ -133,6 +133,10 @@ How to use this framework
 -------------------------
 Clone this git repository and "override" targets in the pipeline framework to perform custom steps to meet your requirements.
 
+Support
+-------
+Check out the [wiki](https://github.com/paulmarshall/pipeline/wiki)
+
 Contributors
 ------------
  - [paulmarshall](https://github.com/paulmarshall) (Paul Marshall)
