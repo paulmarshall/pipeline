@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" DefaultTargets="NoStageDefined">
+
+  <!--
+  CONSTANTS
+  -->
+  <PropertyGroup>
+    <PipelineStage></PipelineStage>
+  </PropertyGroup>
+
+  <Target Name="NoStageDefined">
+    <Error Text="No stage specified"/>
+  </Target>  
+  
+  <Target Name="BeforeBuild">
+    <Message Text="BeforeBuild"/>
+  </Target>
+
+  <Target Name="CoreBuild">
+    <Message Text="CoreBuild"/>
+  </Target>
+
+  <Target Name="AfterBuild">
+    <Message Text="AfterBuild"/>
+  </Target>
+
+  <PropertyGroup>
+    <BuildDependsOn>
+      BeforeBuild;
+      CoreBuild;
+      AfterBuild;
+    </BuildDependsOn>
+  </PropertyGroup>
+  <Target Name="Build" DependsOnTargets="$(BuildDependsOn)">
+    <Message Text="Build"/>
+  </Target>
+
+  <Target Name="BeforeCodeAnalysis">
+    <Message Text="BeforeCodeAnalysis"/>
+  </Target>
+
+  <Target Name="CoreCodeAnalysis">
+    <Message Text="CoreCodeAnalysis"/>
+  </Target>
+
+  <Target Name="AfterCodeAnalysis">
+    <Message Text="AfterCodeAnalysis"/>
+  </Target>
+
+  <PropertyGroup>
+    <CodeAnalysisDependsOn>
+      BeforeCodeAnalysis;
+      CoreCodeAnalysis;
+      AfterCodeAnalysis;
+    </CodeAnalysisDependsOn>
+  </PropertyGroup>
+  <Target Name="CodeAnalysis" DependsOnTargets="$(CodeAnalysisDependsOn)">
+    <Message Text="CodeAnalysis"/>
+  </Target>  
+  
+  <Target Name="BeforeUnitTest">
+    <Message Text="BeforeUnitTest"/>
+  </Target>
+
+  <Target Name="CoreUnitTest">
+    <Message Text="CoreUnitTest"/>
+  </Target>
+
+  <Target Name="AfterUnitTest">
+    <Message Text="AfterUnitTest"/>
+  </Target>
+
+  <PropertyGroup>
+    <UnitTestDependsOn>
+      BeforeUnitTest;
+      CoreUnitTest;
+      AfterUnitTest;
+    </UnitTestDependsOn>
+  </PropertyGroup>
+  <Target Name="UnitTest" DependsOnTargets="$(UnitTestDependsOn)">
+    <Message Text="UnitTest"/>
+  </Target>
+
+  <Target Name="BeforePackage">
+    <Message Text="BeforePackage"/>
+  </Target>
+
+  <Target Name="CorePackage">
+    <Message Text="CorePackage"/>
+  </Target>
+
+  <Target Name="AfterPackage">
+    <Message Text="AfterPackage"/>
+  </Target>
+
+  <PropertyGroup>
+    <PackageDependsOn>
+      BeforePackage;
+      CorePackage;
+      AfterPackage;
+    </PackageDependsOn>
+  </PropertyGroup>
+  <Target Name="Package" DependsOnTargets="$(PackageDependsOn)">
+    <Message Text="Package"/>
+  </Target>
+
+  <Target Name="BeforeConfigureEnvironment">
+    <Message Text="BeforeConfigureEnvironment"/>
+  </Target>
+
+  <Target Name="CoreConfigureEnvironment">
+    <Message Text="CoreConfigureEnvironment"/>
+  </Target>
+
+  <Target Name="AfterConfigureEnvironment">
+    <Message Text="AfterConfigureEnvironment"/>
+  </Target>  
+
+  <PropertyGroup>
+    <ConfigureEnvironmentDependsOn>
+      BeforeConfigureEnvironment;
+      CoreConfigureEnvironment;
+      AfterConfigureEnvironment;
+    </ConfigureEnvironmentDependsOn>
+  </PropertyGroup>
+  <Target Name="ConfigureEnvironment" DependsOnTargets="$(ConfigureEnvironmentDependsOn)">
+    <Message Text="ConfigureEnvironment"/>
+  </Target>
+
+  <Target Name="BeforeDeployPackage">
+    <Message Text="BeforeDeployPackage"/>
+  </Target>
+
+  <Target Name="CoreDeployPackage">
+    <Message Text="CoreDeployPackage"/>
+  </Target>
+
+  <Target Name="AfterDeployPackage">
+    <Message Text="AfterDeployPackage"/>
+  </Target>  
+
+  <PropertyGroup>
+    <DeployPackageDependsOn>
+      BeforeDeployPackage;
+      CoreDeployPackage;
+      AfterDeployPackage;
+    </DeployPackageDependsOn>
+  </PropertyGroup>
+  <Target Name="DeployPackage" DependsOnTargets="$(DeployPackageDependsOn)">
+    <Message Text="DeployPackage"/>
+  </Target>
+
+  <Target Name="BeforeSmokeTest">
+    <Message Text="BeforeSmokeTest"/>
+  </Target>
+
+  <Target Name="CoreSmokeTest">
+    <Message Text="CoreSmokeTest"/>
+  </Target>
+
+  <Target Name="AfterSmokeTest">
+    <Message Text="AfterSmokeTest"/>
+  </Target>
+
+  <PropertyGroup>
+    <SmokeTestDependsOn>
+      BeforeSmokeTest;
+      CoreSmokeTest;
+      AfterSmokeTest;
+    </SmokeTestDependsOn>
+  </PropertyGroup>
+  <Target Name="SmokeTest" DependsOnTargets="$(SmokeTestDependsOn)">
+    <Message Text="SmokeTest"/>
+  </Target>
+
+  <Target Name="BeforeAcceptanceTest">
+    <Message Text="BeforeAcceptanceTest"/>
+  </Target>
+
+  <Target Name="CoreAcceptanceTest">
+    <Message Text="CoreAcceptanceTest"/>
+  </Target>
+
+  <Target Name="AfterAcceptanceTest">
+    <Message Text="AfterAcceptanceTest"/>
+  </Target>  
+
+  <PropertyGroup>
+    <AcceptanceTestDependsOn>
+      BeforeAcceptanceTest;
+      CoreAcceptanceTest;
+      AfterAcceptanceTest;
+    </AcceptanceTestDependsOn>
+  </PropertyGroup>
+  <Target Name="AcceptanceTest" DependsOnTargets="$(AcceptanceTestDependsOn)">
+    <Message Text="AcceptanceTest"/>
+  </Target>
+
+  <Target Name="BeforeGetPackageToDeploy">
+    <Message Text="BeforeGetPackageToDeploy"/>
+  </Target>
+
+  <Target Name="CoreGetPackageToDeploy">
+    <Message Text="CoreGetPackageToDeploy"/>
+  </Target>
+
+  <Target Name="AfterGetPackageToDeploy">
+    <Message Text="AfterGetPackageToDeploy"/>
+  </Target>
+
+  <PropertyGroup>
+    <GetPackageToDeployDependsOn>
+      BeforeGetPackageToDeploy;
+      CoreGetPackageToDeploy;
+      AfterGetPackageToDeploy;
+    </GetPackageToDeployDependsOn>
+  </PropertyGroup>
+  <Target Name="GetPackageToDeploy" DependsOnTargets="$(GetPackageToDeployDependsOn)">
+    <Message Text="GetPackageToDeploy"/>
+  </Target>
+  
+</Project>

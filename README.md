@@ -133,6 +133,10 @@ How to use this framework
 -------------------------
 Clone this git repository and "override" targets in the pipeline framework to perform custom steps to meet your requirements.
 
+External Libraries Used
+-----------------------
+[MSBuildTasks] (https://github.com/loresoft/msbuildtasks)
+
 Support
 -------
 Check out the [wiki](https://github.com/paulmarshall/pipeline/wiki)

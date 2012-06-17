@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <BeforeSmokeTestDependsOn>
+      $(BeforeSmokeTestDependsOn);
+      UpdateSmokeTestConfiguration;
+    </BeforeSmokeTestDependsOn>
+  </PropertyGroup>
+  <Target Name="BeforeSmokeTest" DependsOnTargets="$(BeforeSmokeTestDependsOn)">
+    <Message Text="BeforeSmokeTest (pipeline.plugin.nunit)"/>
+  </Target>
+
+  <Target Name="UpdateSmokeTestConfiguration">
+    <Message Text="UpdateSmokeTestConfiguration (pipeline.plugin.nunit)"/>
+    
+    <ItemGroup>
+      <TestAssemblyFiles Include="$(ArtifactTestFolder)\**\*SmokeTests.dll"></TestAssemblyFiles> 
+    </ItemGroup>
+
+    <ConfigurationUpdater SourceFiles="@(TestAssemblyFiles->'%(Identity).environment.config')"
+                          DestinationFiles="@(TestAssemblyFiles->'%(Identity).config')"
+                          Environment="$(PipelineStage)"/>
+  </Target>
+
+  <PropertyGroup>
+    <BeforeAcceptanceTestDependsOn>
+      $(BeforeAcceptanceTestDependsOn);
+      UpdateIntegrationTestConfiguration;
+      UpdateAcceptanceTestConfiguration;
+    </BeforeAcceptanceTestDependsOn>
+  </PropertyGroup>
+  <Target Name="BeforeAcceptanceTest" DependsOnTargets="$(BeforeAcceptanceTestDependsOn)">
+    <Message Text="BeforeAcceptanceTest (pipeline.plugin.nunit)"/>
+  </Target>
+
+  <Target Name="UpdateIntegrationTestConfiguration">
+    <Message Text="UpdateIntegrationTestConfiguration  (pipeline.plugin.nunit)"/>
+
+    <ItemGroup>
+      <TestAssemblyFiles Include="$(ArtifactTestFolder)\**\*IntegrationTests.dll"></TestAssemblyFiles>
+      <TestAssemblyFiles Include="$(ArtifactTestFolder)\**\*IntegrationTests.x86.dll"></TestAssemblyFiles>
+    </ItemGroup>
+
+    <ConfigurationUpdater SourceFiles="@(TestAssemblyFiles->'%(Identity).environment.config')"
+                          DestinationFiles="@(TestAssemblyFiles->'%(Identity).config')"
+                          Environment="$(PipelineStage)"/>
+
+  </Target>  
+
+
+  <Target Name="UpdateAcceptanceTestConfiguration">
+    <Message Text="UpdateAcceptanceTestConfiguration (pipeline.plugin.nunit)"/>
+
+    <ItemGroup>
+      <TestAssemblyFiles Include="$(ArtifactTestFolder)\**\*AcceptanceTests.dll"></TestAssemblyFiles>
+      <TestAssemblyFiles Include="$(ArtifactTestFolder)\**\*AcceptanceTests.x86.dll"></TestAssemblyFiles>
+    </ItemGroup>  
+
+    <ConfigurationUpdater SourceFiles="@(TestAssemblyFiles->'%(Identity).environment.config')"
+                          DestinationFiles="@(TestAssemblyFiles->'%(Identity).config')"
+                          Environment="$(PipelineStage)"/>
+
+  </Target>  
+
+  <UsingTask
+    TaskName="ConfigurationUpdater"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <DestinationFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]"  Required="true" />
+      <SourceFiles      ParameterType="Microsoft.Build.Framework.ITaskItem[]"  Required="true" />
+      <Environment      ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.IO" />
+      <Reference Include="System.Xml" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Xml" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+                const string SelectSettingsWithxPath = "//environments/environment[@name='{0}']/settings/setting[@xPath]";
+
+                const string SettingXPathAttributeName = "xPath";
+
+                const string SettingValueAttributeName = "value";
+
+                for (int i = 0; i < this.SourceFiles.Length; i++)
+                {
+                    string sourceFile = this.SourceFiles[i].ItemSpec;
+                    string destFile = this.DestinationFiles[i].ItemSpec;
+
+                    Log.LogMessage(string.Format("Source File={0}", sourceFile), new object[0]);
+                    Log.LogMessage(string.Format("Destination File={0}", destFile), new object[0]);
+
+                    if (File.Exists(sourceFile) && File.Exists(destFile))
+                    {
+                        XmlDocument sourceDocument = new XmlDocument();
+                        sourceDocument.Load(sourceFile);
+                        XmlDocument destinationDocument = new XmlDocument();
+                        destinationDocument.Load(destFile);
+                        foreach (XmlNode node in sourceDocument.SelectNodes(string.Format(SelectSettingsWithxPath, this.Environment)))
+                        {
+                            string settingPath = node.Attributes[SettingXPathAttributeName].Value;
+                            string overrideValue = node.Attributes[SettingValueAttributeName].Value;
+                            Log.LogMessage(string.Format("Path={0}", settingPath), new object[0]);
+                            Log.LogMessage(string.Format("New Value={0}", overrideValue), new object[0]);
+                            XmlNode setting = destinationDocument.SelectSingleNode(settingPath);
+                            if (setting == null)
+                            {
+                                throw new Exception(string.Format("No element found with XPath '{0}' in file '{1}'", settingPath, destFile));
+                            }
+                            setting.Value = overrideValue;
+                        }
+                        destinationDocument.Save(destFile);
+                    }
+                    else
+                    {
+                        Log.LogMessage("Skipping as either source or destination file does not exist", new object[0]);
+                    }
+                }
+          ]]>        
+      </Code>
+    </Task>
+  </UsingTask>  
+
+</Project>
