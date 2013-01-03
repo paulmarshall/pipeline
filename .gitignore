@@ -1,0 +1,7 @@
+# OS generated files #
+######################
+Thumbs.db
+
+# VS.NET files #
+######################
+*.suo
