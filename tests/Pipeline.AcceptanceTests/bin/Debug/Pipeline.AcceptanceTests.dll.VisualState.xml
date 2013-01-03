@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<VisualState xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" ShowCheckBoxes="false">
+  <TopNode>[0-1020]D:\Projects\Wavecrest\git\pipeline\src\Pipeline.AcceptanceTests\bin\Debug\Pipeline.AcceptanceTests.dll</TopNode>
+  <SelectedNode>[0-1006]Pipeline.AcceptanceTests.GivenAcceptanceStageAndDefaultTemplate</SelectedNode>
+  <ExcludeCategories>false</ExcludeCategories>
+  <Nodes>
+    <Node UniqueName="[0-1020]D:\Projects\Wavecrest\git\pipeline\src\Pipeline.AcceptanceTests\bin\Debug\Pipeline.AcceptanceTests.dll" Expanded="true" />
+    <Node UniqueName="[0-1021]Pipeline" Expanded="true" />
+    <Node UniqueName="[0-1022]Pipeline.AcceptanceTests" Expanded="true" />
+    <Node UniqueName="[0-1006]Pipeline.AcceptanceTests.GivenAcceptanceStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1017]Pipeline.AcceptanceTests.GivenCommitStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1011]Pipeline.AcceptanceTests.GivenLocalStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1009]Pipeline.AcceptanceTests.GivenNoStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1014]Pipeline.AcceptanceTests.GivenProductionStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1000]Pipeline.AcceptanceTests.GivenQAStageAndDefaultTemplate" Expanded="true" />
+    <Node UniqueName="[0-1003]Pipeline.AcceptanceTests.GivenUATStageAndDefaultTemplate" Expanded="true" />
+  </Nodes>
+</VisualState>

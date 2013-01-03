@@ -1,0 +1,32 @@
+﻿<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<!--This file represents the results of running a test suite-->
+<test-results name="C:\Users\Paul\Documents\GitHub\pipeline\tests\Pipeline.AcceptanceTests\bin\Debug\Pipeline.AcceptanceTests.dll" total="1" errors="0" failures="1" not-run="0" inconclusive="0" ignored="0" skipped="0" invalid="0" date="2012-12-26" time="22:32:22">
+  <environment nunit-version="2.5.3.9345" clr-version="4.0.30319.17929" os-version="Microsoft Windows NT 6.1.7600.0" platform="Win32NT" cwd="C:\Program Files\Microsoft Visual Studio 10.0\Common7\IDE" machine-name="PAUL-LAPTOP" user="Paul" user-domain="PAUL-LAPTOP" />
+  <culture-info current-culture="en-GB" current-uiculture="en-US" />
+  <test-suite name="C:\Users\Paul\Documents\GitHub\pipeline\tests\Pipeline.AcceptanceTests\bin\Debug\Pipeline.AcceptanceTests.dll" executed="True" success="False" time="0.451" asserts="0">
+    <results>
+      <test-suite name="Pipeline" executed="True" success="False" time="0.448" asserts="0">
+        <results>
+          <test-suite name="AcceptanceTests" executed="True" success="False" time="0.445" asserts="0">
+            <results>
+              <test-suite name="GivenCommitStageAndDefaultTemplate" executed="True" success="False" time="0.372" asserts="0">
+                <results>
+                  <test-case name="Pipeline.AcceptanceTests.GivenCommitStageAndDefaultTemplate.ThenPipelineRunsSuccessfully" executed="True" success="False" time="0.003" asserts="1">
+                    <failure>
+                      <message><![CDATA[  Expected: False
+  But was:  True
+]]></message>
+                      <stack-trace><![CDATA[at Pipeline.AcceptanceTests.BaseDefaultTemplateTest.AssertOutputIsSuccessful() in C:\Users\Paul\Documents\GitHub\pipeline\tests\Pipeline.AcceptanceTests\BaseDefaultTemplateTest.cs:line 14
+at Pipeline.AcceptanceTests.GivenCommitStageAndDefaultTemplate.ThenPipelineRunsSuccessfully() in C:\Users\Paul\Documents\GitHub\pipeline\tests\Pipeline.AcceptanceTests\GivenCommitStageAndDefaultTemplate.cs:line 26
+]]></stack-trace>
+                    </failure>
+                  </test-case>
+                </results>
+              </test-suite>
+            </results>
+          </test-suite>
+        </results>
+      </test-suite>
+    </results>
+  </test-suite>
+</test-results>
