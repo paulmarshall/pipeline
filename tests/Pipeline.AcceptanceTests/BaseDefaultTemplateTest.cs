@@ -2,6 +2,7 @@
 using System.Diagnostics;
 using NUnit.Framework;
 using System.Collections.Generic;
+using System.IO;
 
 namespace Pipeline.AcceptanceTests
 {
@@ -49,7 +50,7 @@ namespace Pipeline.AcceptanceTests
             p.StartInfo = new ProcessStartInfo();
             p.StartInfo.UseShellExecute = false;
             p.StartInfo.CreateNoWindow = true;
-            p.StartInfo.FileName = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\msbuild.exe";
+            p.StartInfo.FileName = Path.Combine(GetRuntimeFolder(), "msbuild.exe");
             p.StartInfo.RedirectStandardOutput = true;
             p.StartInfo.Arguments = string.Format(string.IsNullOrEmpty(stage) ? @"/nologo build.xml" : @"/nologo build.xml /t:{0}", stage);
 
@@ -58,6 +59,11 @@ namespace Pipeline.AcceptanceTests
             var output = p.StandardOutput.ReadToEnd();
             Console.WriteLine(output);
             return output;
+        }
+
+        private string GetRuntimeFolder()
+        {
+            return System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory();
         }
     }
 }
