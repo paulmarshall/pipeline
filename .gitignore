@@ -2,6 +2,11 @@
 ######################
 Thumbs.db
 
-# VS.NET files #
+# VS.NET files       #
 ######################
 *.suo
+
+# Compiled Source    #
+######################
+bin
+obj
