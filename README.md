@@ -101,6 +101,9 @@ The pattern central to the book is the "deployment pipeline", an automated imple
 
 Overview
 --------
+
+Implementation
+--------
 The Pipeline framework is built upon MSBuild v4.0 and is comprised of the following files:
 
 * Core
@@ -120,6 +123,8 @@ The Pipeline framework is built upon MSBuild v4.0 and is comprised of the follow
 	* build.xml
 * Sample version file (for use with pipeline.plugin.version.xml)
 	* version.xml
+
+Because the framework using MSBuild, many of the aspects are open for extension.
 
 History
 -------
