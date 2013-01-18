@@ -6,8 +6,5 @@
    </PropertyGroup>
 
   <Import Project="pipeline.template.default.xml"/>
-  <Import Project="pipeline.plugin.version.xml"/>
-  <Import Project="pipeline.plugin.nunit.xml"/>
-  <Import Project="pipeline.plugin.nunit.config.xml"/>
  
 </Project>

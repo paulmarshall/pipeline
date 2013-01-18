@@ -3,6 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline.AcceptanceTests", "tests\Pipeline.AcceptanceTests\Pipeline.AcceptanceTests.csproj", "{97C5CEBF-2295-4069-9F57-B6369278286A}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AF44DB0A-C063-49F9-A0FF-49BEAAF88457}"
+	ProjectSection(SolutionItems) = preProject
+		src\build.xml = src\build.xml
+		src\pipeline.core.xml = src\pipeline.core.xml
+		src\pipeline.plugin.nunit.config.xml = src\pipeline.plugin.nunit.config.xml
+		src\pipeline.plugin.nunit.xml = src\pipeline.plugin.nunit.xml
+		src\pipeline.plugin.version.xml = src\pipeline.plugin.version.xml
+		src\pipeline.template.default.xml = src\pipeline.template.default.xml
+		src\pipeline.xml = src\pipeline.xml
+		src\version.xml = src\version.xml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{D87AB4B5-AC6F-43ED-ADA8-804E0002676A}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -16,5 +30,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{97C5CEBF-2295-4069-9F57-B6369278286A} = {D87AB4B5-AC6F-43ED-ADA8-804E0002676A}
 	EndGlobalSection
 EndGlobal
