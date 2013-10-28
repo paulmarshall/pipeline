@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Pipeline.AcceptanceTests
 {
-    [TestFixture]
+    [TestFixture, Ignore("Production Stage not supported yet")]
     public class GivenProductionStageAndDefaultTemplate : BaseDefaultTemplateTest
     {
         [TestFixtureSetUp]

@@ -2,9 +2,25 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
   <PropertyGroup>
-    <MSBuildExtensionsPath Condition="$(MSBuildExtensionsPath) != ''">$(MSBuildProjectDirectory)lib\MSBuild\</MSBuildExtensionsPath>
-   </PropertyGroup>
+    <ExtensionTasksPath Condition="$(ExtensionTasksPath)==''">MSBuild\ExtensionPack\4.0\</ExtensionTasksPath>
+  </PropertyGroup>
 
-  <Import Project="pipeline.template.default.xml"/>
- 
+  <Import Project="pipeline.core.xml"/>
+  
+  <Import Project="pipeline.plugin.version.xml"/>
+  <Import Project="pipeline.plugin.nunit.xml"/>
+  <Import Project="pipeline.plugin.nunit.config.xml"/>
+  <!--<
+  Import Project="pipeline.plugin.nuget.xml"/>
+  -->
+  <Import Project="pipeline.plugin.msbuild.xml"/>
+  <Import Project="pipeline.plugin.jenkins.xml"/>
+  <Import Project="pipeline.plugin.environment.xml"/>
+  <!--
+  <Import Project="pipeline.plugin.webdeploy.xml"/>
+  <Import Project="pipeline.plugin.windows.services.xml"/>
+  <Import Project="pipeline.plugin.consoles.xml"/>
+  -->
+  <Import Project="pipeline.stages.xml"/>
+
 </Project>

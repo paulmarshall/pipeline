@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+ <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Web.WebClient"/>
+ <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Compression.Zip"/>
+
+ <PropertyGroup>
+    <ArtifactFile>archive.zip</ArtifactFile>
+    <CIServerUrl Condition="'$(JENKINS_URL)' == ''">http://gba58270v:8181/jenkins/</CIServerUrl>
+ </PropertyGroup>
+
+  <PropertyGroup>
+    <BeforeBuildDependsOn>
+      GetBuildArtifacts;
+      $(BeforeBuildDependsOn);
+    </BeforeBuildDependsOn>
+  </PropertyGroup>
+  <Target Name="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
+    <Message Text="BeforeBuild (pipeline.plugin.jenkins)"/>
+  </Target>
+
+  <Target Name="GetBuildArtifacts" 
+          Outputs="%(BuildArtifactConfiguration.Identity)" 
+          Condition="@(BuildArtifactConfiguration) != ''">
+    <Message Text="GetBuildArtifacts (pipeline.plugin.jenkins)"/>
+
+    <PropertyGroup>
+      <_WhichBuild Condition="'$(_WhichBuild)' == ''">lastStableBuild</_WhichBuild>
+      <_WhichBuild Condition="'%(BuildArtifactConfiguration.WhichBuild)' != ''">%(BuildArtifactConfiguration.WhichBuild)</_WhichBuild>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <_ArtifactFolder Condition="'%(BuildArtifactConfiguration.TargetFolder)' == ''">$(MSBuildStartupDirectory)</_ArtifactFolder>
+      <_ArtifactFolder Condition="'%(BuildArtifactConfiguration.TargetFolder)' != ''">$(MSBuildStartupDirectory)\%(BuildArtifactConfiguration.TargetFolder)</_ArtifactFolder>
+    </PropertyGroup>
+
+    <MakeDir Directories="$(_ArtifactFolder)"
+             Condition="!Exists('$(_ArtifactFolder)')"/>
+
+    <!-- 
+        Makes request for archive in the format "http://CIServer/jenkins/job/Common_Commit/lastStableBuild/artifact/*zip*/archive.zip "
+      -->
+    <WebDownload FileUri="$(CIServerUrl)job/%(BuildArtifactConfiguration.Identity)/$(_WhichBuild)/artifact/*zip*/$(ArtifactFile)"
+                 FileName="$(_ArtifactFolder)\$(ArtifactFile)" />
+
+    <Unzip ZipFileName="$(_ArtifactFolder)\$(ArtifactFile)"
+           TargetDirectory="$(_ArtifactFolder)"/>
+
+    <!-- 
+        This copies to <Targetfolder>\archive.
+        The Jenkins artifact zip stores the archived files in a folder called "archive".
+        We need to copy the contents of this archive folder to <Targetfolder> and finally delete the archive folder
+        -->
+
+    <ItemGroup>
+      <ExtractedFiles Include="$(_ArtifactFolder)\archive\**\*.*"/>
+    </ItemGroup>
+
+    <!-- Implementation Notes: Copy files recursively whilst still maintaining folder structure: http://blogs.msdn.com/b/msbuild/archive/2005/11/07/490068.aspx  -->
+    <Copy SourceFiles="@(ExtractedFiles)"
+          DestinationFolder="$(_ArtifactFolder)\%(RecursiveDir)"/>
+
+    <!-- Tidy up -->
+    <RemoveDir Directories="$(_ArtifactFolder)\archive"/>
+    <Delete Files="$(_ArtifactFolder)\$(ArtifactFile)"/>
+
+  </Target>
+
+  <Target Name="CoreGetPackageToDeploy">
+    <Message Text="CoreGetPackageToDeploy (pipeline.plugin.jenkins)"/>
+
+    <MakeDir Directories="$(ArtifactFolder)"
+             Condition="!Exists('$(ArtifactFolder)')"/>
+    <!--
+    $(ArtifactUrl) provided by jenkins
+    -->
+    <WebClient TaskAction="DownloadFile" 
+			         Url="$(ArtifactUrl)artifact/artifact/*zip*/$(ArtifactFile)" 
+			         FileName="$(ArtifactFolder)\$(ArtifactFile)" 
+               Condition="'$(ArtifactUrl)' != ''"/>
+
+    <!-- 
+    Unzip to the workspace directory
+    Because the zip contents are all contained within an artifact folder,
+    all the files are unzipped to <workspace>/artifact, which is what we want
+    -->
+
+    <Zip TaskAction="Extract" 
+			   ExtractPath="$(MSBuildStartupDirectory)" 
+         ZipFileName="$(ArtifactFolder)\$(ArtifactFile)" 
+         Condition="Exists('$(ArtifactFolder)\$(ArtifactFile)')"/>
+	
+	  <!-- Finally delete the downloaded artifact file -->	
+	 <Delete Files="$(ArtifactFolder)\$(ArtifactFile)"/>		 
+
+  </Target>
+  
+</Project>

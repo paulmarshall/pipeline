@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <NUnitToolPath Condition=" '$(NUnitToolPath)' == '' ">$(MSBuildStartupDirectory)\packages\NUnit.Runners.2.6.2\tools\</NUnitToolPath>
+    <NUnitConsoleTool>$(NUnitToolPath)nunit-console.exe</NUnitConsoleTool>
+    <NUnitConsoleTool-x86>$(NUnitToolPath)nunit-console-x86.exe</NUnitConsoleTool-x86>
+    <NUnitConsoleToolArgs>/nologo /noshadow /xml=</NUnitConsoleToolArgs>
+  </PropertyGroup>
 
   <PropertyGroup>
-    <NUnitToolPath Condition=" '$(NUnitToolPath)' == '' ">$(MSBuildStartupDirectory)\lib\nunit\</NUnitToolPath>
-    <NUnitConsoleTool-x86>$(NUnitToolPath)nunit-console-x86.exe</NUnitConsoleTool-x86>
-    <NUnitConsoleTool>$(NUnitToolPath)nunit-console.exe</NUnitConsoleTool>
-    <NUnitConsoleToolArgs>/nologo /noshadow /xml=</NUnitConsoleToolArgs>
+    <NUnitConsoleToolArgsForAcceptanceTests>/exclude:SmokeTest $(NUnitConsoleToolArgs)</NUnitConsoleToolArgsForAcceptanceTests>
+    <NUnitConsoleToolArgsForAcceptanceTestsMarkedAsBeingSmokeTests>/include:SmokeTest $(NUnitConsoleToolArgs)</NUnitConsoleToolArgsForAcceptanceTestsMarkedAsBeingSmokeTests>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -19,9 +23,18 @@
   </Target>
 
   <PropertyGroup>
+    <CoreSmokeTestDependsOn>
+      $(CoreSmokeTestDependsOn);
+      RunSmokeTest;
+    </CoreSmokeTestDependsOn>
+  </PropertyGroup>
+  <Target Name="CoreSmokeTest" DependsOnTargets="$(CoreSmokeTestDependsOn)">
+    <Message Text="CoreSmokeTest (pipeline.plugin.nunit)"/>
+  </Target>  
+
+  <PropertyGroup>
     <CoreAcceptanceTestDependsOn>
       $(CoreAcceptanceTestDependsOn);
-      RunIntegrationTest;
       RunAcceptanceTest;
     </CoreAcceptanceTestDependsOn>
   </PropertyGroup>
@@ -33,51 +46,33 @@
     <Message Text="RunUnitTest (pipeline.plugin.nunit)"/>
 
     <ItemGroup>
-      <UnitTestAssemblies Include="$(MSBuildStartupDirectory)\**\bin\$(Configuration)\*UnitTests.dll"/>
+      <UnitTestAssemblies Include="$(MSBuildStartupDirectory)\**\*UnitTests.dll"/>
     </ItemGroup>
 
     <Exec Command="&quot;$(NUnitConsoleTool)&quot; @(UnitTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\unit-test-results.xml&quot;"
           Condition=" '@(UnitTestAssemblies)' != '' "/>
 
     <ItemGroup>
-      <UnitTestAssemblies-x86 Include="$(MSBuildStartupDirectory)\**\bin\$(Configuration)\*UnitTests.x86.dll"/>
+      <UnitTestAssemblies-x86 Include="$(MSBuildStartupDirectory)\**\bin\$(Configuration)\*UnitTests-x86.dll"/>
     </ItemGroup>
 
-    <Exec Command="&quot;$(NUnitConsoleTool-x86)&quot; @(UnitTestAssemblies-x86 ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\unit-x86-test-results.xml&quot;"
+    <Exec Command="&quot;$(NUnitConsoleTool-x86)&quot; @(UnitTestAssemblies-x86 ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\unit-test-results.xml&quot;"
           Condition=" '@(UnitTestAssemblies-x86)' != '' "/>
 
-  </Target> 
+  </Target>
 
   <Target Name="RunSmokeTest">
     <Message Text="RunSmokeTest (pipeline.plugin.nunit)"/>
 
+    <!-- Acceptance test libraries that may have tests marked as being smoke tests -->
     <ItemGroup>
-      <SmokeTestAssemblies Include="$(ArtifactTestFolder)\*SmokeTests.dll"></SmokeTestAssemblies>
+      <SmokeTests_AcceptanceTestAssemblies Include="$(ArtifactTestFolder)\*AcceptanceTests.dll"></SmokeTests_AcceptanceTestAssemblies>
     </ItemGroup>
-
-    <Exec Command="&quot;$(NUnitConsoleTool)&quot; @(SmokeTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\smoke-test-results.xml&quot;" 
-          Condition=" '@(SmokeTestAssemblies)' != '' "/>
-
-  </Target>
-
-  <Target Name="RunIntegrationTest">
-    <Message Text="RunIntegrationTest (pipeline.plugin.nunit)"/>
-
-    <ItemGroup>
-      <IntegrationAcceptanceTestAssemblies Include="$(ArtifactTestFolder)\*IntegrationTests.dll"></IntegrationAcceptanceTestAssemblies>
-    </ItemGroup>
-    <Exec Command="$(NUnitConsoleTool) @(IntegrationAcceptanceTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgsForAcceptanceTests)&quot;$(MSBuildStartupDirectory)\integration-test-results.xml&quot;"
-          Condition=" '@(IntegrationAcceptanceTestAssemblies)' != '' "/>
-
-    <ItemGroup>
-      <IntegrationAcceptanceTestAssemblies-x86 Include="$(ArtifactTestFolder)\*IntegrationTests.x86.dll"></IntegrationAcceptanceTestAssemblies-x86>
-    </ItemGroup>
-
-    <Exec Command="$(NUnitConsoleTool-x86) @(IntegrationAcceptanceTestAssemblies-x86 ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgsForAcceptanceTests)&quot;$(MSBuildStartupDirectory)\integration-x86-test-results.xml&quot;" 
-          Condition=" '@(IntegrationAcceptanceTestAssemblies-x86)' != '' "/>
+    <Exec Command="&quot;$(NUnitConsoleTool)&quot; @(SmokeTests_AcceptanceTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgsForAcceptanceTestsMarkedAsBeingSmokeTests)&quot;$(MSBuildStartupDirectory)\smoke-test-results.xml&quot;"
+      Condition=" '@(SmokeTests_AcceptanceTestAssemblies)' != '' "/>
 
   </Target>  
-
+  
   <Target Name="RunAcceptanceTest">
     <Message Text="RunAcceptanceTest (pipeline.plugin.nunit)"/>
 
@@ -87,12 +82,19 @@
     <Exec Command="&quot;$(NUnitConsoleTool)&quot; @(AcceptanceTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgsForAcceptanceTests)&quot;$(MSBuildStartupDirectory)\acceptance-test-results.xml&quot;" 
           Condition=" '@(AcceptanceTestAssemblies)' != '' "/>
 
-    <ItemGroup>
-      <AcceptanceTestAssemblies-x86 Include="$(ArtifactTestFolder)\*AcceptanceTests.x86.dll"></AcceptanceTestAssemblies-x86>
-    </ItemGroup>
-    <Exec Command="&quot;$(NUnitConsoleTool-x86)&quot; @(AcceptanceTestAssemblies-x86 ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgsForAcceptanceTests)&quot;$(MSBuildStartupDirectory)\acceptance-x86-test-results.xml&quot;"
-          Condition=" '@(AcceptanceTestAssemblies-x86)' != '' "/>
+  </Target>
 
-  </Target>  
+  <Target Name="PackageTests">
+    <Message Text="PackageTests (pipeline.plugin.nunit)"/>
+    <ItemGroup>
+      <TestProjects Include="$(MSBuildStartupDirectory)\**\*Tests\*.csproj"/>
+    </ItemGroup>
+    <ItemGroup>
+      <TestFiles Include="%(TestProjects.RootDir)%(TestProjects.Directory)bin\$(Configuration)\*.*" 
+                 Exclude="%(TestProjects.RootDir)%(TestProjects.Directory)bin\$(Configuration)\*.pdb"/>
+    </ItemGroup> 
+    <Copy DestinationFolder="$(ArtifactTestFolder)" 
+          SourceFiles="@(TestFiles)"/>
+  </Target>
   
 </Project>

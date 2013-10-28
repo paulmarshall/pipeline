@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+<PropertyGroup>
+  <EnvironmentConfigFileName>environment.config</EnvironmentConfigFileName>
+</PropertyGroup>
+
+  <UsingTask
+    TaskName="GetConfigurationValue"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <FileName         ParameterType="System.String" Required="true" />
+      <Environment      ParameterType="System.String" Required="true" />
+      <Name             ParameterType="System.String" Required="true" />
+      <Value            ParameterType="Microsoft.Build.Framework.ITaskItem" Output="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Xml" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Xml" />      
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+
+            const string SingleSettingValueByName = "//environment[@name='{0}']/settings/setting[@name='{1}']/@value";
+
+            try
+            {
+                Log.LogMessage(string.Format("File Name={0}, Environment={1}, Name={2}", 
+                    this.FileName, this.Environment,this.Name), new object[0]);
+
+                if (File.Exists(this.FileName))
+                {
+                    XmlDocument environmentConfigFile = new XmlDocument();
+                    environmentConfigFile.Load(this.FileName);
+
+                    XmlAttribute valueAttribute = environmentConfigFile.SelectSingleNode(string.Format(SingleSettingValueByName, this.Environment, this.Name)) as XmlAttribute;
+
+                    if (valueAttribute != null)
+                    {
+                        string value = valueAttribute.Value;
+
+                        Log.LogMessage(string.Format("Environment={0}, Name={1}, Value={2}", this.Environment,this.Name, value), new object[0]);
+
+                        // Poke the named value in a task item so that it can be extracted as an Output item from the task
+                        this.Value = new TaskItem(value);
+                    }
+                    else
+                    {
+                        Log.LogError(string.Format("Named value '{0}' does not exist", this.Name), new object[0]);
+                    }
+                }
+                else
+                {
+                    Log.LogError(string.Format("File '{0}' does not exist", this.FileName), new object[0]);
+                }
+            }
+            catch (Exception exception)
+            {
+                Log.LogErrorFromException(exception);
+            }
+          ]]>  
+      </Code>        
+    </Task>
+  </UsingTask>  
+
+
+  <UsingTask
+    TaskName="ConfigurationUpdater"
+    TaskFactory="CodeTaskFactory"
+    AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.v4.0.dll" >
+    <ParameterGroup>
+      <DestinationFiles ParameterType="Microsoft.Build.Framework.ITaskItem[]"  Required="true" />
+      <SourceFiles      ParameterType="Microsoft.Build.Framework.ITaskItem[]"  Required="true" />
+      <Environment      ParameterType="System.String" Required="true" />
+    </ParameterGroup>
+    <Task>
+      <Reference Include="System.Xml" />
+      <Using Namespace="System.IO" />
+      <Using Namespace="System.Xml" />
+      <Code Type="Fragment" Language="cs">
+        <![CDATA[
+                const string SelectSettingsWithxPath = "//environments/environment[@name='{0}']/settings/setting[@xPath]";
+
+                const string SettingXPathAttributeName = "xPath";
+
+                const string SettingValueAttributeName = "value";
+
+                for (int i = 0; i < this.SourceFiles.Length; i++)
+                {
+                    string sourceFile = this.SourceFiles[i].ItemSpec;
+                    string destFile = this.DestinationFiles[i].ItemSpec;
+
+                    Log.LogMessage(string.Format("Source File={0}", sourceFile), new object[0]);
+                    Log.LogMessage(string.Format("Destination File={0}", destFile), new object[0]);
+
+                    if (File.Exists(sourceFile) && File.Exists(destFile))
+                    {
+                        XmlDocument sourceDocument = new XmlDocument();
+                        sourceDocument.Load(sourceFile);
+                        XmlDocument destinationDocument = new XmlDocument();
+                        destinationDocument.Load(destFile);
+                        foreach (XmlNode node in sourceDocument.SelectNodes(string.Format(SelectSettingsWithxPath, this.Environment)))
+                        {
+                            string settingPath = node.Attributes[SettingXPathAttributeName].Value;
+                            string overrideValue = node.Attributes[SettingValueAttributeName].Value;
+                            Log.LogMessage(string.Format("Path={0}", settingPath), new object[0]);
+                            Log.LogMessage(string.Format("New Value={0}", overrideValue), new object[0]);
+                            XmlNode setting = destinationDocument.SelectSingleNode(settingPath);
+                            if (setting == null)
+                            {
+                                throw new Exception(string.Format("No element found with XPath '{0}' in file '{1}'", settingPath, destFile));
+                            }
+                            setting.Value = overrideValue;
+                        }
+                        destinationDocument.Save(destFile);
+                    }
+                    else
+                    {
+                        Log.LogMessage("Skipping as either source or destination file does not exist", new object[0]);
+                    }
+                }
+          ]]>        
+      </Code>
+    </Task>
+  </UsingTask>  
+
+</Project>

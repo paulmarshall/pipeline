@@ -1,16 +1,23 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2012
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Pipeline.AcceptanceTests", "tests\Pipeline.AcceptanceTests\Pipeline.AcceptanceTests.csproj", "{97C5CEBF-2295-4069-9F57-B6369278286A}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{AF44DB0A-C063-49F9-A0FF-49BEAAF88457}"
 	ProjectSection(SolutionItems) = preProject
 		src\build.xml = src\build.xml
 		src\pipeline.core.xml = src\pipeline.core.xml
+		src\pipeline.plugin.consoles.xml = src\pipeline.plugin.consoles.xml
+		src\pipeline.plugin.environment.xml = src\pipeline.plugin.environment.xml
+		src\pipeline.plugin.jenkins.xml = src\pipeline.plugin.jenkins.xml
+		src\pipeline.plugin.msbuild.xml = src\pipeline.plugin.msbuild.xml
+		src\pipeline.plugin.nuget.xml = src\pipeline.plugin.nuget.xml
 		src\pipeline.plugin.nunit.config.xml = src\pipeline.plugin.nunit.config.xml
 		src\pipeline.plugin.nunit.xml = src\pipeline.plugin.nunit.xml
 		src\pipeline.plugin.version.xml = src\pipeline.plugin.version.xml
-		src\pipeline.template.default.xml = src\pipeline.template.default.xml
+		src\pipeline.plugin.webdeploy.xml = src\pipeline.plugin.webdeploy.xml
+		src\pipeline.plugin.windows.services.xml = src\pipeline.plugin.windows.services.xml
+		src\pipeline.stages.xml = src\pipeline.stages.xml
 		src\pipeline.xml = src\pipeline.xml
 		src\version.xml = src\version.xml
 	EndProjectSection

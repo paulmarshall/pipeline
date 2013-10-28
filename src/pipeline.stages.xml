@@ -1,15 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <Import Project="pipeline.core.xml"/>
-
   <PropertyGroup>
     <LocalStage>Local</LocalStage>
     <CommitStage>Commit</CommitStage>
     <AcceptanceStage>Acceptance</AcceptanceStage>
     <QAStage>QA</QAStage>
-    <UATStage>UAT</UATStage>
-    <ProductionStage>Production</ProductionStage>
   </PropertyGroup>
 
   <PropertyGroup>
@@ -20,7 +16,7 @@
   </PropertyGroup>
 
   <PropertyGroup>
-    <ArtifactFolder>$(MSBuildStartupDirectory)\artifact</ArtifactFolder>
+    <ArtifactFolder>$(MSBuildStartupDirectory)\Artifact</ArtifactFolder>
     <ArtifactTestFolder>$(ArtifactFolder)\Tests</ArtifactTestFolder>
   </PropertyGroup>  
 
@@ -40,6 +36,7 @@
       ConfigureEnvironment;
       DeployPackage;
       SmokeTest;
+      AcceptanceTest;
     </LocalDependsOn>
   </PropertyGroup>
   <Target Name="Local" DependsOnTargets="$(LocalDependsOn)">
@@ -105,45 +102,5 @@
   <Target Name="QA" DependsOnTargets="$(QADependsOn)">
     <Message Text="QA"/>
   </Target>
-
-  <Target Name="SetPipelineStageToUAT">
-    <Message Text="SetPipelineStageToUAT"/>
-    <PropertyGroup>
-      <PipelineStage>$(UATStage)</PipelineStage>
-    </PropertyGroup>
-  </Target>
-  
-  <PropertyGroup>
-    <UATDependsOn>
-      SetPipelineStageToUAT;
-      GetPackageToDeploy;
-      ConfigureEnvironment;
-      DeployPackage;
-      SmokeTest
-    </UATDependsOn>
-  </PropertyGroup>
-  <Target Name="UAT" DependsOnTargets="$(UATDependsOn)">
-    <Message Text="UAT"/>
-  </Target>
-
-  <Target Name="SetPipelineStageToProduction">
-    <Message Text="SetPipelineStageToProduction"/>
-    <PropertyGroup>
-      <PipelineStage>$(ProductionStage)</PipelineStage>
-    </PropertyGroup>
-  </Target>  
-  
-  <PropertyGroup>
-    <ProductionDependsOn>
-      SetPipelineStageToProduction;
-      GetPackageToDeploy;
-      ConfigureEnvironment;
-      DeployPackage;
-      SmokeTest
-    </ProductionDependsOn>
-  </PropertyGroup>
-  <Target Name="Production" DependsOnTargets="$(ProductionDependsOn)">
-    <Message Text="Production"/>
-  </Target>  
   
 </Project>

@@ -1,12 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <PropertyGroup>
-    <MSBuildCommunityTasksPath Condition="$(MSBuildCommunityTasksPath)==''">$(MSBuildProjectDirectory)\lib</MSBuildCommunityTasksPath>
-  </PropertyGroup>
-
-  <UsingTask  AssemblyFile="$(MSBuildCommunityTasksPath)\MSBuild.Community.Tasks.dll" 
-              TaskName="MSBuild.Community.Tasks.XmlRead"></UsingTask>  
+  <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Xml.XmlFile"/>
 
   <PropertyGroup>
     <VersionFile Condition="'$(VersionFile)' == ''">version.xml</VersionFile>
@@ -14,29 +9,65 @@
 
   <PropertyGroup>
     <BeforeBuildDependsOn>
+      GetVersion;
       $(BeforeBuildDependsOn);
-      GetVersionFromFile;
     </BeforeBuildDependsOn>
   </PropertyGroup>
   <Target Name="BeforeBuild" DependsOnTargets="$(BeforeBuildDependsOn)">
     <Message Text="BeforeBuild (pipeline.plugin.version)"/>
-  </Target> 
+  </Target>
 
-  <Target Name="GetVersionFromFile">
-    <Message Text="GetVersionFromFile (pipeline.plugin.version)"/>
+  <PropertyGroup>
+    <GetVersionDependsOn>
+      GetProductVersionFromFile;
+      GetBuildNumber;
+    </GetVersionDependsOn>
+  </PropertyGroup>
+  <Target Name="GetVersion" DependsOnTargets="$(GetVersionDependsOn)">
+    <Message Text="GetVersion (pipeline.plugin.version)"/>
+
+    <PropertyGroup>
+      <VersionFull>$(VersionMajor).$(VersionMinor).$(VersionBuild).$(VersionRevision)</VersionFull>
+    </PropertyGroup>
+    <Message Text="Version=$(VersionFull)"/>
+
+  </Target>
+
+  <Target Name="GetBuildNumber">
+    <Message Text="GetBuildNumber (pipeline.plugin.version)"/>
+
+	<!--
+	The Subversion SCM plugin exports the svn revisions and URLs of the build's subversion modules as environment variables. 
+	-->
+    <PropertyGroup>
+      <!--<VersionBuild Condition="'$(BUILD_NUMBER)' != ''">$(BUILD_NUMBER)</VersionBuild>-->
+      <!--<VersionBuild Condition="'$(BUILD_NUMBER)' == ''">0</VersionBuild>-->
+      <VersionBuild Condition="'$(SVN_REVISION)' != ''">$(SVN_REVISION)</VersionBuild>
+      <VersionBuild Condition="'$(SVN_REVISION)' == ''">0</VersionBuild>
+    </PropertyGroup>
+
+  </Target>
+
+  <Target Name="GetProductVersionFromFile">
+    <Message Text="GetProductVersionFromFile (pipeline.plugin.version)"/>
 
     <Error Condition="!Exists('$(VersionFile)')" 
            Text="Version file '$(VersionFile)' does not exist"/>
 
-    <XmlRead XmlFileName="$(VersionFile)" XPath="version/major">
+    <XmlFile TaskAction="ReadElementText" File="$(VersionFile)" XPath="version/major">
       <Output TaskParameter="Value" PropertyName="VersionMajor" />
-    </XmlRead>
-    <XmlRead XmlFileName="$(VersionFile)" XPath="version/minor">
-      <Output TaskParameter="Value" PropertyName="VersionMinor" />
-    </XmlRead>
-    <XmlRead XmlFileName="$(VersionFile)" XPath="version/revision">
-      <Output TaskParameter="Value" PropertyName="VersionRevision" />
-    </XmlRead>
+    </XmlFile>
 
+    <XmlFile TaskAction="ReadElementText" File="$(VersionFile)" XPath="version/minor">
+      <Output TaskParameter="Value" PropertyName="VersionMinor" />
+    </XmlFile>
+
+    <XmlFile TaskAction="ReadElementText" File="$(VersionFile)" XPath="version/revision">
+      <Output TaskParameter="Value" PropertyName="VersionRevision" />
+    </XmlFile>
+
+    <Message Text="Version (pipeline.plugin.version): $(VersionMajor).$(VersionMinor).$(VersionRevision)"/>
+  
   </Target>
+
 </Project>

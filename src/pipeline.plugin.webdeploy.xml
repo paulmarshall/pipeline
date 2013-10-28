@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <PropertyGroup>
+    <MSDeployExePath Condition="$(MSDeployExePath)==''">C:\Program Files\IIS\Microsoft Web Deploy v2\msdeploy.exe</MSDeployExePath>
+    <ParametersFileName>SetParameters.xml</ParametersFileName>
+    <DeployEnvironmentConfigurationFile>deploy.$(EnvironmentConfigFileName)</DeployEnvironmentConfigurationFile>
+    <ComponentEnvironmentConfigurationFile>component.$(EnvironmentConfigFileName)</ComponentEnvironmentConfigurationFile>
+  </PropertyGroup>
+
+  <Target Name="PackageWeb"
+          Outputs="%(WebPackageBuildConfiguration.Identity)">
+    <Message Text="PackageWeb (Id=%(WebPackageBuildConfiguration.Identity))"/>
+
+    <!-- Create MSDeploy package-->
+    <MSBuild Projects="%(WebPackageBuildConfiguration.Identity)"
+             Targets="Package"
+             Properties="Configuration=%(WebPackageBuildConfiguration.FlavorToBuild)"/>
+
+    <ItemGroup>
+      <WebSourceFiles Include="$(MSBuildStartupDirectory)\**\%(WebPackageBuildConfiguration.FileName)\obj\$(Configuration)\Package\*.*" 
+                      Exclude="$(MSBuildStartupDirectory)\**\*deploy.cmd;$(MSBuildStartupDirectory)\**\*deploy-readme.txt;$(MSBuildStartupDirectory)\**\*SetParameters.xml;$(MSBuildStartupDirectory)\**\*SourceManifest.xml"/>
+      <WebComponentEnvironmentConfigurationFile Include="$(MSBuildStartupDirectory)\**\%(WebPackageBuildConfiguration.FileName)\$(ComponentEnvironmentConfigurationFile)" />
+      <WebDeployEnvironmentConfigurationFile Include="$(MSBuildStartupDirectory)\**\%(WebPackageBuildConfiguration.FileName)\$(DeployEnvironmentConfigurationFile)" />
+      <WebSetParametersFile Include="$(MSBuildStartupDirectory)\**\%(WebPackageBuildConfiguration.FileName)\$(ParametersFileName)" />      
+    </ItemGroup>
+   
+    <!-- Copy Web package files to artifact-->
+    <Copy SourceFiles="@(WebSourceFiles)"
+          DestinationFolder="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)"/>
+
+    <!-- Copy Component Environment.Config file to artifact-->
+    <Copy SourceFiles="@(WebComponentEnvironmentConfigurationFile)"
+            DestinationFolder="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)"/>
+
+    <!-- Copy Deployment Environment.Config file to artifact-->
+    <Copy SourceFiles="@(WebDeployEnvironmentConfigurationFile)"
+            DestinationFolder="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)"/>
+
+    <!-- Copy parameters file to artifact-->
+    <Copy SourceFiles="@(WebSetParametersFile)"
+          DestinationFolder="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)"/>              
+  </Target>
+
+  <Target Name="DeployWeb" 
+	  Outputs="%(WebPackageBuildConfiguration.Identity)">
+      <Message Text="DeployWeb (Id=%(WebPackageBuildConfiguration.Identity))"/>  
+
+    <Error Condition="!Exists('$(MSDeployExePath)')" 
+           Text="Microsoft Web Deploy '$(MSDeployExePath)' does not exist"/>      
+
+      <GetConfigurationValue FileName="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\$(DeployEnvironmentConfigurationFile)"
+                               Environment="$(PipelineStage)"
+                               Name="WebServer">
+        <Output TaskParameter="Value" PropertyName="WebServer"/>
+      </GetConfigurationValue>
+
+      <GetConfigurationValue FileName="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\$(DeployEnvironmentConfigurationFile)"
+                               Environment="$(PipelineStage)"
+                               Name="RemoteUserName">
+        <Output TaskParameter="Value" PropertyName="UserName"/>
+      </GetConfigurationValue>
+      <GetConfigurationValue FileName="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\$(DeployEnvironmentConfigurationFile)"
+                               Environment="$(PipelineStage)"
+                               Name="RemoteUserPassword">
+        <Output TaskParameter="Value" PropertyName="Password"/>
+      </GetConfigurationValue>
+
+      <PropertyGroup>
+        <ComputerName>http://$(WebServer)/MSdeployAgentService</ComputerName>
+        <UserName>$(UserName)</UserName>
+        <Password>$(Password)</Password>
+        <UserNameCommand Condition="'$(UserName)'!=''">,username=&quot;$(UserName)&quot;</UserNameCommand>
+        <PasswordCommand Condition="'$(Password)'!=''">,password=&quot;$(Password)&quot;</PasswordCommand>
+      </PropertyGroup>
+
+      <PropertyGroup>
+        <Website>$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\</Website>
+      </PropertyGroup>
+
+      <!-- Update the SetParameters.xml file with environment-specific settings -->
+      <ConfigurationUpdater SourceFiles="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\$(ComponentEnvironmentConfigurationFile)"
+                            DestinationFiles="$(ArtifactFolder)\Web\%(WebPackageBuildConfiguration.FileName)\$(ParametersFileName)"
+                            Environment="$(PipelineStage)"/>
+
+      <!-- Deploy the component -->
+      <Exec Command="&quot;$(MSDeployExePath)&quot; -source:package=&quot;$(Website)%(WebPackageBuildConfiguration.FileName).zip&quot; -dest:auto,computerName=&quot;$(ComputerName)&quot;,includeAcls=&quot;False&quot;$(UserNameCommand)$(PasswordCommand) -verb:sync -disableLink:AppPoolExtension -disableLink:ContentExtension -disableLink:CertificateExtension -setParamFile:&quot;$(Website)$(ParametersFileName)&quot;"
+            Condition=" '$(Website)' != '' "/>
+
+    </Target>  
+
+</Project>

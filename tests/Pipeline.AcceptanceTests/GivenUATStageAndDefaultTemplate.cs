@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace Pipeline.AcceptanceTests
 {
-    [TestFixture]
+    [TestFixture, Ignore("UAT Stage not supported yet")]
     public class GivenUATStageAndDefaultTemplate : BaseDefaultTemplateTest
     {
         [TestFixtureSetUp]

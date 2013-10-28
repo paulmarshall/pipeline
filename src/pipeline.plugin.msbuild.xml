@@ -1,0 +1,124 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+
+  <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.FileSystem.File"/>
+
+  <PropertyGroup>
+    <Configuration>Release</Configuration>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <OrganisationLegalCopyright>TODO - copyright</OrganisationLegalCopyright>
+    <OrganisationLegalTrademark>TODO - trademarks</OrganisationLegalTrademark>
+  </PropertyGroup>  
+
+  <!--
+  Example usage:
+  <ItemGroup>
+    <DotNetBuildConfiguration Include="$(MSBuildStartupDirectory)\MySolution.sln">
+      <FlavorToBuild>$(Configuration)</FlavorToBuild>
+      <PlatformToBuild>Any CPU</PlatformToBuild>
+    </DotNetBuildConfiguration>
+    ...
+  </ItemGroup>
+  -->
+
+  <PropertyGroup>
+    <CoreBuildDependsOn>
+      BuildDotNet;
+    </CoreBuildDependsOn>
+  </PropertyGroup>
+  <Target Name="CoreBuild" DependsOnTargets="$(CoreBuildDependsOn)">
+    <Message Text="CoreBuild (pipeline.plugin.msbuild)"/>
+  </Target>
+
+  <PropertyGroup>
+    <BuildDotNetDependsOn>
+      _UpdateDotNetAssemblyVersionNumberAndLegalInfo;
+      _BuildMSBuildSolution
+    </BuildDotNetDependsOn>
+  </PropertyGroup>
+  <Target Name="BuildDotNet" 
+          DependsOnTargets="$(BuildDotNetDependsOn)">
+    <Message Text="BuildDotNet (pipeline.plugin.msbuild)"/>
+  </Target>
+
+  <PropertyGroup>
+    <BuildDotNetProjectDependsOn>
+      _BuildMSBuildProject
+    </BuildDotNetProjectDependsOn>
+  </PropertyGroup>
+  <Target Name="BuildDotNetProject"
+          DependsOnTargets="$(BuildDotNetProjectDependsOn)">
+    <Message Text="BuildDotNetProject (pipeline.plugin.msbuild)"/>
+  </Target>
+
+  <Target Name="_UpdateDotNetAssemblyVersionNumberAndLegalInfo" 
+          Condition="$(PipelineStage) != $(LocalStage)">
+    <Message Text="_UpdateDotNetAssemblyVersionNumberAndLegalInfo"/>
+
+    <ItemGroup>
+      <AssemblyInfoFiles Include="$(MSBuildStartupDirectory)\**\AssemblyInfo.cs"/>
+    </ItemGroup>
+
+    <!-- Version -->
+    <File TaskAction="Replace"
+          RegexPattern="AssemblyVersion\(&quot;.*&quot;\)"
+          Replacement="AssemblyVersion(&quot;$(VersionFull)&quot;)"
+          Files="@(AssemblyInfoFiles)" 
+          Condition="'@(AssemblyInfoFiles)' != ''"/>
+
+    <File TaskAction="Replace"
+          RegexPattern="AssemblyFileVersion\(&quot;.*&quot;\)"
+          Replacement="AssemblyFileVersion(&quot;$(VersionFull)&quot;)"
+          Files="@(AssemblyInfoFiles)" 
+          Condition="'@(AssemblyInfoFiles)' != ''"/>
+    
+    <!-- Legal -->
+    <File TaskAction="Replace"
+          RegexPattern="AssemblyCopyright\(&quot;.*&quot;\)"
+          Replacement="AssemblyCopyright(&quot;$(OrganisationLegalCopyright)&quot;)"
+          Files="@(AssemblyInfoFiles)" 
+          Condition="'@(AssemblyInfoFiles)' != ''"/>
+
+    <File TaskAction="Replace"
+          RegexPattern="AssemblyTrademark\(&quot;.*&quot;\)"
+          Replacement="AssemblyTrademark(&quot;$(OrganisationLegalTrademark)&quot;)"
+          Files="@(AssemblyInfoFiles)" 
+          Condition="'@(AssemblyInfoFiles)' != ''"/>
+
+  </Target>
+
+  <Target Name="_BuildMSBuildSolution" 
+          Outputs="%(DotNetBuildConfiguration.Identity)">
+    <Message Text="_BuildMSBuildSolution (Id=%(DotNetBuildConfiguration.Identity))"/>
+
+    <MSBuild Projects="%(DotNetBuildConfiguration.Identity)"
+             Targets="Build"
+             Properties="Configuration=%(DotNetBuildConfiguration.FlavorToBuild);Platform=%(DotNetBuildConfiguration.PlatformToBuild);VersionFull=$(VersionFull);%(DotNetBuildConfiguration.AdditionalProperties)"/>
+
+  </Target>
+
+  <Target Name="_BuildMSBuildProject"
+        Outputs="%(DotNetProjectBuildConfiguration.Identity)">
+    <Message Text="_BuildMSBuildProject (Id=%(DotNetProjectBuildConfiguration.Identity))"/>
+
+    <Message Text="Configuration=%(DotNetBuildConfiguration.FlavorToBuild);Platform=%(DotNetBuildConfiguration.PlatformToBuild);VersionFull=$(VersionFull);%(DotNetBuildConfiguration.AdditionalProperties)"/>
+    
+    <MSBuild Projects="%(DotNetBuildConfiguration.Identity)"
+             Targets="%(DotNetProjectBuildConfiguration.Identity)"
+             Properties="Configuration=%(DotNetBuildConfiguration.FlavorToBuild);Platform=%(DotNetBuildConfiguration.PlatformToBuild);VersionFull=$(VersionFull);%(DotNetBuildConfiguration.AdditionalProperties)"/>
+
+  </Target>
+
+  <Target Name="PackageWeb"
+		Outputs="%(WebPackageBuildConfiguration.Identity)">
+    <Message Text="PackageWeb (Id=%(WebPackageBuildConfiguration.Identity)) (pipeline.plugin.msbuild)"/>
+
+    <MSBuild Projects="%(WebPackageBuildConfiguration.Identity)"
+             Targets="Package"
+             Properties="Configuration=%(WebPackageBuildConfiguration.FlavorToBuild)"/>
+
+  </Target>
+
+</Project>

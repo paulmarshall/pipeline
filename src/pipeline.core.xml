@@ -196,6 +196,29 @@
     <Message Text="AcceptanceTest"/>
   </Target>
 
+  <Target Name="BeforeIntegrationTest">
+    <Message Text="BeforeIntegrationTest"/>
+  </Target>
+
+  <Target Name="CoreIntegrationTest">
+    <Message Text="CoreIntegrationTest"/>
+  </Target>
+
+  <Target Name="AfterIntegrationTest">
+    <Message Text="AfterIntegrationTest"/>
+  </Target>   
+  
+  <PropertyGroup>
+    <IntegrationTestDependsOn>
+      BeforeIntegrationTest;
+      CoreIntegrationTest;
+      AfterIntegrationTest;
+    </IntegrationTestDependsOn>
+  </PropertyGroup>
+  <Target Name="IntegrationTest" DependsOnTargets="$(IntegrationTestDependsOn)">
+    <Message Text="IntegrationTest"/>
+  </Target>  
+  
   <Target Name="BeforeGetPackageToDeploy">
     <Message Text="BeforeGetPackageToDeploy"/>
   </Target>
