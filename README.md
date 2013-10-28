@@ -10,29 +10,36 @@ Quick Start
 
 4. This generates the following output:
 
-		Microsoft (R) Build Engine version 4.0.30319.17379
-		[Microsoft .NET Framework, version 4.0.30319.17379]
+		Microsoft (R) Build Engine version 4.0.30319.17929
+		[Microsoft .NET Framework, version 4.0.30319.18052]
 		Copyright (C) Microsoft Corporation. All rights reserved.
 
-		Build started 12/06/2012 22:24:05.
-		Project "C:\Users\Paul\Documents\GitHub\pipeline\build.xml" on node 1 (Local target(s)).
+		Build started 28/10/2013 08:48:35.
+		Project "C:\Users\Paul.Marshall\Documents\GitHub\pipeline\src\build.xml" on node 1 (Local target(s)).
 		SetPipelineStageToLocal:
 		  SetPipelineStageToLocal
-		GetVersionFromFile:
-		  GetVersionFromFile (pipeline.plugin.version)
-		  Reading Xml Document "version.xml".
-		    1 node(s) selected for read.
-		  XmlRead Result: "1"
-		  Reading Xml Document "version.xml".
-		    1 node(s) selected for read.
-		  XmlRead Result: "0"
-		  Reading Xml Document "version.xml".
-		    1 node(s) selected for read.
-		  XmlRead Result: "0"
+		GetProductVersionFromFile:
+		  GetProductVersionFromFile (pipeline.plugin.version)
+		  XmlFile: version.xml
+		  Read Element: version/major
+		  XmlFile: version.xml
+		  Read Element: version/minor
+		  XmlFile: version.xml
+		  Read Element: version/revision
+		  Version (pipeline.plugin.version): 0.0.0
+		GetBuildNumber:
+		  GetBuildNumber (pipeline.plugin.version)
+		GetVersion:
+		  GetVersion (pipeline.plugin.version)
+		  Version=0.0.0.0
 		BeforeBuild:
-		  BeforeBuild (pipeline.plugin.version)
+		  BeforeBuild (pipeline.plugin.jenkins)
+		_BuildMSBuildSolution:
+		  _BuildMSBuildSolution (Id=)
+		BuildDotNet:
+		  BuildDotNet (pipeline.plugin.msbuild)
 		CoreBuild:
-		  CoreBuild
+		  CoreBuild (pipeline.plugin.msbuild)
 		AfterBuild:
 		  AfterBuild
 		Build:
@@ -71,25 +78,37 @@ Quick Start
 		  AfterDeployPackage
 		DeployPackage:
 		  DeployPackage
-		UpdateSmokeTestConfiguration:
-		  UpdateSmokeTestConfiguration (pipeline.plugin.nunit)
+		UpdateAcceptanceTestConfiguration:
+		  UpdateAcceptanceTestConfiguration (pipeline.plugin.nunit)
 		BeforeSmokeTest:
-		  BeforeSmokeTest (pipeline.plugin.nunit)
+		  BeforeSmokeTest (pipeline.plugin.nunit.config)
+		RunSmokeTest:
+		  RunSmokeTest (pipeline.plugin.nunit)
 		CoreSmokeTest:
-		  CoreSmokeTest
+		  CoreSmokeTest (pipeline.plugin.nunit)
 		AfterSmokeTest:
 		  AfterSmokeTest
 		SmokeTest:
 		  SmokeTest
+		BeforeAcceptanceTest:
+		  BeforeAcceptanceTest
+		RunAcceptanceTest:
+		  RunAcceptanceTest (pipeline.plugin.nunit)
+		CoreAcceptanceTest:
+		  CoreAcceptanceTest (pipeline.plugin.nunit)
+		AfterAcceptanceTest:
+		  AfterAcceptanceTest
+		AcceptanceTest:
+		  AcceptanceTest
 		Local:
 		  Local
-		Done Building Project "C:\Users\Paul\Documents\GitHub\pipeline\build.xml" (Local target(s)).
+		Done Building Project "C:\Users\Paul.Marshall\Documents\GitHub\pipeline\src\build.xml" (Local target(s)).
 
 		Build succeeded.
 		    0 Warning(s)
 		    0 Error(s)
 
-		Time Elapsed 00:00:01.23
+		Time Elapsed 00:00:00.23
 
 Concept
 -------
@@ -109,16 +128,29 @@ The Pipeline framework is built upon MSBuild v4.0 and is comprised of the follow
 * Core
 	* pipeline.xml
 		Defines core concepts of steps in a deployment pipeline
-* Pipeline templates
-	* pipeline.template.default.xml
-		Provides an example deployment pipeline
+	* pipeline.stages.xml
+		Defines stages for a specific deployment pipeline		
 * Pipeline plugins
+	* pipeline.plugin.environment
+		Provides functions to manage environment specific settings
+	* pipeline.plugin.jenkins
+		Functions to interact with Jenkin's artifacts
+	* pipeline.plugin.msbuild
+		Builds VS.NET solutions using msbuild		
+	* pipeline.plugin.nuget
+		Funcitons to interact with nuget		
 	* pipeline.plugin.version.xml
 		Reads version information from an XML file
 	* pipeline.plugin.nunit.xml
 		Runs nunit tests
 	* pipeline.plugin.nunit.config.xml
 		Implements an inline task to update
+	* pipeline.plugin.consoles
+		Packages and deploys windows console applications	
+	* pipeline.plugin.webdeploy
+		Packages and deploys web applications using WebDeploy			
+	* pipeline.plugin.windows.services
+		Packages and deploys windows services		
 * Sample project build file
 	* build.xml
 * Sample version file (for use with pipeline.plugin.version.xml)
