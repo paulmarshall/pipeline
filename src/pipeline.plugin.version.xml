@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
 
-  <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" TaskName="MSBuild.ExtensionPack.Xml.XmlFile"/>
+  <UsingTask AssemblyFile="$(ExtensionTasksPath)MSBuild.ExtensionPack.dll" 
+             TaskName="MSBuild.ExtensionPack.Xml.XmlFile"/>
 
   <PropertyGroup>
     <VersionFile Condition="'$(VersionFile)' == ''">version.xml</VersionFile>
@@ -36,9 +37,10 @@
   <Target Name="GetBuildNumber">
     <Message Text="GetBuildNumber (pipeline.plugin.version)"/>
 
-	<!--
-	The Subversion SCM plugin exports the svn revisions and URLs of the build's subversion modules as environment variables. 
-	-->
+	  <!--
+	  BUILD_NUMBER - A property exported by Jenkins
+    SVN_REVISION - A property exported by the Jenkins Subversion SCM plugin
+	  -->
     <PropertyGroup>
       <!--<VersionBuild Condition="'$(BUILD_NUMBER)' != ''">$(BUILD_NUMBER)</VersionBuild>-->
       <!--<VersionBuild Condition="'$(BUILD_NUMBER)' == ''">0</VersionBuild>-->

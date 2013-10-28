@@ -46,18 +46,11 @@
     <Message Text="RunUnitTest (pipeline.plugin.nunit)"/>
 
     <ItemGroup>
-      <UnitTestAssemblies Include="$(MSBuildStartupDirectory)\**\*UnitTests.dll"/>
+      <UnitTestAssemblies Include="$(MSBuildStartupDirectory)\**\bin\$(Configuration)\*UnitTests.dll"/>
     </ItemGroup>
 
     <Exec Command="&quot;$(NUnitConsoleTool)&quot; @(UnitTestAssemblies ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\unit-test-results.xml&quot;"
           Condition=" '@(UnitTestAssemblies)' != '' "/>
-
-    <ItemGroup>
-      <UnitTestAssemblies-x86 Include="$(MSBuildStartupDirectory)\**\bin\$(Configuration)\*UnitTests-x86.dll"/>
-    </ItemGroup>
-
-    <Exec Command="&quot;$(NUnitConsoleTool-x86)&quot; @(UnitTestAssemblies-x86 ->'&quot;%(Identity)&quot;',' ') $(NUnitConsoleToolArgs)&quot;$(MSBuildStartupDirectory)\unit-test-results.xml&quot;"
-          Condition=" '@(UnitTestAssemblies-x86)' != '' "/>
 
   </Target>
 
